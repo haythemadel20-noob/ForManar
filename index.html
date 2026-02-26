@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Pretty Question</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Quicksand:wght@500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #fff0f6;
+            font-family: 'Quicksand', sans-serif;
+            overflow: hidden;
+        }
+
+        #game-container {
+            text-align: center;
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        h1 {
+            color: #ff4d6d;
+            font-size: 2.5rem;
+            margin-bottom: 40px;
+            pointer-events: none;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 30px;
+            position: relative;
+        }
+
+        button {
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.1s;
+        }
+
+        #yesBtn {
+            background-color: #ff4d6d;
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 77, 109, 0.3);
+        }
+
+        /* The "Runaway" Button */
+        #noBtn {
+            background-color: #adb5bd;
+            color: white;
+            position: absolute; /* Allows it to move anywhere */
+            left: 120px; 
+            transition: all 0.1s ease-out;
+            white-space: nowrap;
+        }
+
+        /* The Balloon Stage */
+        #balloon-stage {
+            display: none;
+        }
+
+        #balloon {
+            font-size: 60px;
+            display: inline-block;
+            cursor: pointer;
+            transition: transform 0.2s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+            filter: drop-shadow(0 10px 10px rgba(0,0,0,0.1));
+        }
+
+        /* Final Reveal */
+        #message-screen {
+            display: none;
+            animation: popIn 0.5s border-box;
+        }
+
+        .cute-text {
+            font-family: 'Dancing Script', cursive;
+            font-size: 5rem;
+            color: #ff4d6d;
+            margin: 0;
+        }
+
+        /* Animations */
+        @keyframes popIn {
+            0% { transform: scale(0); }
+            100% { transform: scale(1); }
+        }
+
+        .rose {
+            position: fixed;
+            top: -50px;
+            font-size: 2.5rem;
+            user-select: none;
+            z-index: 1000;
+            animation: fall linear forwards;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(110vh) rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <div id="question-screen">
+            <h1>Are you beautiful?</h1>
+            <div class="buttons">
+                <button id="yesBtn">Yes</button>
+                <button id="noBtn">No</button>
+            </div>
+        </div>
+
+        <div id="balloon-stage">
+            <h2 style="color: #ff758f;">It's a surprise! Tap it 3 times...</h2>
+            <div id="balloon">🎈</div>
+        </div>
+
+        <div id="message-screen">
+            <h1 class="cute-text">I know! ✨</h1>
+        </div>
+    </div>
+
+    <script>
+        const noBtn = document.getElementById('noBtn');
+        const yesBtn = document.getElementById('yesBtn');
+        const questionScreen = document.getElementById('question-screen');
+        const balloonStage = document.getElementById('balloon-stage');
+        const balloon = document.getElementById('balloon');
+        const messageScreen = document.getElementById('message-screen');
+
+        // --- 1. THE MOVEABLE NO BUTTON ---
+        noBtn.addEventListener('mouseover', () => {
+            // Calculate random positions within the visible window
+            const padding = 50;
+            const newX = Math.random() * (window.innerWidth - noBtn.offsetWidth - padding);
+            const newY = Math.random() * (window.innerHeight - noBtn.offsetHeight - padding);
+            
+            noBtn.style.position = 'fixed';
+            noBtn.style.left = newX + 'px';
+            noBtn.style.top = newY + 'px';
+        });
+
+        // --- 2. CLICK YES ---
+        yesBtn.addEventListener('click', () => {
+            questionScreen.style.display = 'none';
+            balloonStage.style.display = 'block';
+        });
+
+        // --- 3. BLOWING THE BALLOON ---
+        let clicks = 0;
+        balloon.addEventListener('click', () => {
+            clicks++;
+            
+            if (clicks === 1) {
+                balloon.style.transform = 'scale(2.5)';
+            } else if (clicks === 2) {
+                balloon.style.transform = 'scale(5)';
+            } else if (clicks === 3) {
+                burst();
+            }
+        });
+
+        // --- 4. THE BURST AND ROSES ---
+        function burst() {
+            balloonStage.style.display = 'none';
+            messageScreen.style.display = 'block';
+            
+            // Create 60 falling roses
+            for (let i = 0; i < 60; i++) {
+                setTimeout(() => {
+                    const rose = document.createElement('div');
+                    rose.classList.add('rose');
+                    rose.innerHTML = '🌹';
+                    rose.style.left = Math.random() * 100 + 'vw';
+                    rose.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                    rose.style.fontSize = (Math.random() * 20 + 20) + 'px';
+                    document.body.appendChild(rose);
+
+                    // Remove rose after animation to keep browser fast
+                    setTimeout(() => rose.remove(), 5000);
+                }, i * 50); // Slight delay so they don't all fall at once
+            }
+        }
+    </script>
+</body>
+</html>
